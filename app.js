@@ -29,6 +29,31 @@ app.get('/', (req, res) => {
   });
 });
 
+//user routes
+//get info from authenticated user
+app.get("/api/users", async(req, res) => {
+  try {
+    const user = await User.findAll();
+    res.status(202).json({user});
+  } catch(error) {
+     console.log("there was an issue returning the user", error);
+     res.json({error: error})
+  }
+
+})
+
+//create a new user
+app.post("/api/users", async(req, res) => {
+  try {
+    const user = await User.create(req.body);
+    res.location("/").status(201);
+  } catch (error) {
+    console.log("sorry, there was an error when adding a user", error);
+  }
+});
+
+
+
 // send 404 if no other route matched
 app.use((req, res) => {
   res.status(404).json({
@@ -48,15 +73,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-//user routes
-app.get("/api/users", async(req, res) => {
-   try {
-     const user = await User.findAll();
-     res.status(202).json({user});
-   } catch (error) {
-      console.log("there was an issue returning the user", error);
-   }
-})
+
+
+
+
+
 
 // set our port
 app.set('port', process.env.PORT || 5000);
@@ -66,14 +87,15 @@ const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
 
+
+
 // async IIFE
+//connect to database
 (async () => {
   try {
     await sequelize.authenticate();
     console.log("connection to the database successful");
   } catch (error) {
     console.error('Error connecting to the database: ', error);
-
   }
-
 })();
