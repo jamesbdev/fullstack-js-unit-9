@@ -4,6 +4,9 @@
 const express = require('express');
 const morgan = require('morgan');
 
+const { User } = require("./models");
+const { Course } = require("./models");
+
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -44,6 +47,16 @@ app.use((err, req, res, next) => {
     error: {},
   });
 });
+
+//user routes
+app.get("/api/users", async(req, res) => {
+   try {
+     const user = await User.findAll();
+     res.status(202).json({user});
+   } catch (error) {
+      console.log("there was an issue returning the user", error);
+   }
+})
 
 // set our port
 app.set('port', process.env.PORT || 5000);
