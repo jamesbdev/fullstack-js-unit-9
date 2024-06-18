@@ -33,6 +33,7 @@ app.get('/', (req, res) => {
 //get info from authenticated user
 app.get("/api/users", async(req, res) => {
   try {
+    //find currently authenticated user
     const user = await User.findAll();
     res.status(202).json({user});
   } catch(error) {
@@ -52,6 +53,30 @@ app.post("/api/users", async(req, res) => {
   }
 });
 
+//get all courses
+app.get("/api/courses", async(req, res) => {
+  try {
+    const courses = await Course.findAll();
+    res.json(courses).status(200);
+  } catch (error) {
+    console.log("Sorry, there was an error when retrieving courses", error);
+  }
+})
+
+//get specific course
+app.get("/api/courses/:id", async(req, res) => {
+  const courseId = req.params.id;
+  try {
+    const course = await Course.findAll({
+      where: {
+        id: courseId,
+      }
+    });
+    res.json(course).status(200);
+  } catch (error) {
+    console.log("Sorry there was an error when retrieving this course", error)
+  }
+})
 
 
 // send 404 if no other route matched
