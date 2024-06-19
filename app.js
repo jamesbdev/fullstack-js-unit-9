@@ -99,6 +99,27 @@ app.post("/api/courses", jsonParser, async(req, res) => {
   }
 })
 
+//update course route
+app.put("/api/courses/:id", jsonParser, async (req, res) => {
+  //store course id from the params
+  const courseId = req.params.id;
+  //update course
+  try {
+   const course = await Course.update(req.body, {where: {
+     id: courseId,
+   }})
+   //return 204 status code
+   res.status(204);
+   //add success message
+   console.log("Course has been updated:", req.body);
+  } catch (error) {
+    console.log("Sorry, there was an error when updating a course: ", error);
+  }
+
+})
+
+//add delete route
+
 
 // send 404 if no other route matched
 app.use((req, res) => {
