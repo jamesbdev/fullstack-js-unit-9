@@ -3,6 +3,7 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
 const { User } = require("./models");
 const { Course } = require("./models");
@@ -12,6 +13,10 @@ const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: 'fsjstd-restapi.db'
 })
+
+//add JSON parser 
+const jsonParser = bodyParser.json();
+const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -75,6 +80,22 @@ app.get("/api/courses/:id", async(req, res) => {
     res.json(course).status(200);
   } catch (error) {
     console.log("Sorry there was an error when retrieving this course", error)
+  }
+})
+
+//create a new course 
+app.post("/api/courses", jsonParser, async(req, res) => {
+  const newCourse = req.body; 
+  try {
+    //create course
+    const course = await Course.create(newCourse);
+    //set location to the created course
+    //set status to 201
+    res.location(`/api/courses/${course.id}`).status(201);
+    //log success message
+    console.log("course has been created", newCourse);
+  } catch (error) {
+    console.log("Sorry there was an error when creating the course: ", error);
   }
 })
 
