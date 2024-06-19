@@ -44,7 +44,6 @@ app.get("/api/users", async(req, res) => {
     res.status(202).json({user});
   } catch(error) {
      console.log("there was an issue returning the user", error);
-     res.json(error).status(400);
   }
 
 })
@@ -99,6 +98,7 @@ app.post("/api/courses", jsonParser, async(req, res) => {
     console.log("course has been created", newCourse);
   } catch (error) {
     console.log("Sorry there was an error when creating the course: ", error);
+    res.status(400).send(error);
   }
 })
 
@@ -117,6 +117,7 @@ app.put("/api/courses/:id", jsonParser, async (req, res) => {
    console.log("Course has been updated:", req.body);
   } catch (error) {
     console.log("Sorry, there was an error when updating a course: ", error);
+    res.status(400).send(error);
   }
 
 })
