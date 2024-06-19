@@ -119,6 +119,23 @@ app.put("/api/courses/:id", jsonParser, async (req, res) => {
 })
 
 //add delete route
+app.delete("/api/courses/:id", jsonParser, async (req, res) => {
+  //store id from params
+  const courseId = req.params.id;
+  try {
+    //delete course
+    const course = await Course.destroy({ where: 
+      {
+        id: courseId,
+      }
+    });
+    //send success message
+    res.status(204);
+    console.log("course has been successfully deleted", courseId);
+  } catch (error) {
+    console.log("Sorry there was an error deleting the course:", error);
+  }
+})
 
 
 // send 404 if no other route matched
