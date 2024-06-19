@@ -9,6 +9,7 @@ const { User } = require("./models");
 const { Course } = require("./models");
 
 const Sequelize = require('sequelize');
+
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: 'fsjstd-restapi.db'
@@ -43,7 +44,7 @@ app.get("/api/users", async(req, res) => {
     res.status(202).json({user});
   } catch(error) {
      console.log("there was an issue returning the user", error);
-     res.json({error: error})
+     res.json(error).status(400);
   }
 
 })
@@ -55,6 +56,8 @@ app.post("/api/users", async(req, res) => {
     res.location("/").status(201);
   } catch (error) {
     console.log("sorry, there was an error when adding a user", error);
+    //send back error message to client
+    res.status(400).json(error);
   }
 });
 
