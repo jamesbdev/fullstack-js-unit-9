@@ -3,6 +3,8 @@ const { Model } = require('sequelize');
 
 const Course = require("./course");
 
+const bcrypt = require('bcryptjs');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -58,6 +60,7 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+    
       validate: {
         notNull: {
           msg: "Please enter a value for 'password'.",
@@ -65,11 +68,24 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: {
           msg: "Please enter a value for 'password'.",
         }
-      }
+      },
+      set(value) {
+          const hashedPassword = bcrypt.hashSync(value, 10);
+          this.setDataValue("password", hashedPassword);
+        
+      },
     }
   }, {
     sequelize,
     modelName: 'User',
+    hooks: {
+      beforeCreate: async (user) => {
+        if(user.password) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      }
+    }
   });
   return User;
 };
