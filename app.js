@@ -4,10 +4,12 @@
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-//import bcrypt hashing library
-const bcrypt = require('bcryptjs');
-const saltRounds = 10;
 
+//import authentication library
+const auth = require('basic-auth');
+//import password hashing library
+const bcrypt = require('bcryptjs');
+//import models
 const { User } = require("./models");
 const { Course } = require("./models");
 
@@ -44,6 +46,7 @@ app.get("/api/users", async(req, res) => {
   try {
     //find currently authenticated user
     const user = await User.findAll();
+
     res.status(202).json({user});
   } catch(error) {
      console.error("there was an issue returning the user", error);
@@ -117,10 +120,10 @@ app.put("/api/courses/:id", jsonParser, async (req, res) => {
    const course = await Course.update(req.body, {where: {
      id: courseId,
    }})
-   //return 204 status code
-   res.status(204);
-   //add success message
-   console.log("Course has been updated:", req.body);
+    //return 204 status code
+    res.status(204);
+    //add success message
+    console.log("Course has been updated:", req.body);
   } catch (error) {
     console.error("Sorry, there was an error when updating a course: ", error);
     //send back error message
@@ -147,6 +150,32 @@ app.delete("/api/courses/:id", jsonParser, async (req, res) => {
     console.log("Sorry there was an error deleting the course:", error);
   }
 })
+
+//user authentication middleware 
+exports.authenticateUser = async (req, res, next) => {
+  let message;
+  const credentials = auth(req);
+  console.log(credentials);
+  if(credentials) {
+    const user = await User.findOne({where: {username: credentials.name}});
+    if(user) {
+      const authenticated = bcrypt.compareSync(credentials.pass, user.password);
+      if (authenticated) {
+        console.log(`Authentication for username: ${user.username}`);
+
+        //store the user on the Request object.
+        req.currentUser = user;
+      } else {
+        message = `Authentication failure for username: ${user.username}`;
+      }
+    } else {
+      message = `User not found for username: ${user.username}`;
+    }
+  } else {
+    message = `Auth header not found`;
+  }
+  next();
+}
 
 
 // send 404 if no other route matched
