@@ -9,7 +9,7 @@ const jsonParser = bodyParser.json();
 const { authenticateUser } = require("../middleware/auth-user");
 
 //get all courses
-router.get("/api/courses", async(req, res) => {
+router.get("/", async(req, res) => {
     try {
       const courses = await Course.findAll();
       res.json(courses).status(200);
@@ -19,7 +19,7 @@ router.get("/api/courses", async(req, res) => {
   })
   
   //get specific course
-  router.get("/api/courses/:id", async(req, res) => {
+  router.get("/:id", async(req, res) => {
     const courseId = req.params.id;
     try {
       const course = await Course.findAll({
@@ -34,7 +34,7 @@ router.get("/api/courses", async(req, res) => {
   })
   
   //create a new course 
-  router.post("/api/courses", authenticateUser, jsonParser, async(req, res) => {
+  router.post("/", authenticateUser, jsonParser, async(req, res) => {
     const newCourse = req.body; 
     try {
       //create course
@@ -52,7 +52,7 @@ router.get("/api/courses", async(req, res) => {
   })
   
   //update course route
-  router.put("/api/courses/:id", authenticateUser, jsonParser, async (req, res) => {
+  router.put("/:id", authenticateUser, jsonParser, async (req, res) => {
     //store course id from the params
     const courseId = req.params.id;
     //update course
@@ -73,7 +73,7 @@ router.get("/api/courses", async(req, res) => {
   })
   
   //add delete route
-  router.delete("/api/courses/:id", authenticateUser, jsonParser, async (req, res) => {
+  router.delete("/:id", authenticateUser, jsonParser, async (req, res) => {
     //store id from params
     const courseId = req.params.id;
     try {

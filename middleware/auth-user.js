@@ -4,24 +4,22 @@ const auth = require("basic-auth");
 const { User } = require("../models/");
 
 
-const Sequelize = require('sequelize');
-
 //import password hashing library
 const bcrypt = require("bcryptjs");
 
 //user authentication middleware
 exports.authenticateUser = async (req, res, next) => {
   let message;
-  console.log("user", {User});  
   //get crendentials from authorized header
   const credentials = auth(req);
+  console.log("credentials", credentials);
   try {
     if (credentials) {
       //get user from database with same Email address
       const user = await User.findOne({
         where: { emailAddress: credentials.name },
       });
-      console.log(user);
+   
       if (user) {
         //compare password with stored password
         const authenticated = bcrypt.compareSync(

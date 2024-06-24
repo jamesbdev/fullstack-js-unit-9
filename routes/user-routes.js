@@ -16,12 +16,11 @@ const auth = require("basic-auth");
 router.get("/", authenticateUser, async(req, res) => {
     //how to get authenticated user info?
     try {
-      const credentials = auth.req;
-      console.log(credentials);
+      console.log(req.currentUser);
       //find currently authenticated user
       const user = await User.findOne({
         where: {
-            emailAddress: credentials.name,
+            emailAddress: req.currentUser.emailAddress,
            
         }
     });
@@ -34,7 +33,7 @@ router.get("/", authenticateUser, async(req, res) => {
   });
   
   //create a new user
-  router.post("/", jsonParser, async(req, res) => {
+  router.post("/", authenticateUser, jsonParser, async(req, res) => {
     try {
       //create user entry
       const user = await User.create(req.body);
