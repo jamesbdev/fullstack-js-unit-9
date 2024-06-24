@@ -1,37 +1,47 @@
 const express = require('express');
 const router = express.Router();
+//import bodyparse
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+//import authentication middleware
 const { authenticateUser } = require("../middleware/auth-user");
+//import user model
+const { User } = require("../models");
+const auth = require("basic-auth");
+
+
 
 
 //get info from authenticated user
-router.get("/api/users", authenticateUser, async(req, res) => {
-    const user = req.currentUser;
-    res.json({
-        name: user.name,
-        username: user.username
-    });
-
+router.get("/", authenticateUser, async(req, res) => {
+    //how to get authenticated user info?
     try {
+      const credentials = auth.req;
+      console.log(credentials);
       //find currently authenticated user
-      const user = await User.findAll();
+      const user = await User.findOne({
+        where: {
+            emailAddress: credentials.name,
+           
+        }
+    });
+    console.log(user);
   
       res.status(202).json({user});
     } catch(error) {
-       console.error("there was an issue returning the user", error);
+       console.error("There was an issue returning the user.", error);
     }
   });
   
   //create a new user
-  router.post("/api/users", jsonParser, async(req, res) => {
+  router.post("/", jsonParser, async(req, res) => {
     try {
       //create user entry
       const user = await User.create(req.body);
       res.location("/").status(201);
-      console.log("user created successfully", user);
+      console.log("User created successfully.", user);
     } catch (error) {
-      console.error("sorry, there was an error when adding a user:", error);
+      console.error("Sorry, there was an error when adding a user:", error);
       //send back error message to client
       res.status(400).json(error);
     }

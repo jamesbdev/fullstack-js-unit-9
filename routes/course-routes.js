@@ -1,7 +1,11 @@
+//import express
 const express = require('express');
+//create router instance
 const router = express.Router();
+//import body-parser 
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+//import authentication middleware
 const { authenticateUser } = require("../middleware/auth-user");
 
 //get all courses

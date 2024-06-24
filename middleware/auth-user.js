@@ -1,32 +1,59 @@
+const express = require('express');
+const auth = require("basic-auth");
+//import user model
+const { User } = require("../models/");
 
-//user authentication middleware 
+
+const Sequelize = require('sequelize');
+
+//import password hashing library
+const bcrypt = require("bcryptjs");
+
+//user authentication middleware
 exports.authenticateUser = async (req, res, next) => {
-    let message;
-    const credentials = auth(req);
-    console.log(credentials);
-    if(credentials) {
-      const user = await User.findOne({where: {username: credentials.name}});
-      if(user) {
-        const authenticated = bcrypt.compareSync(credentials.pass, user.password);
+  let message;
+  console.log("user", {User});  
+  //get crendentials from authorized header
+  const credentials = auth(req);
+  try {
+    if (credentials) {
+      //get user from database with same Email address
+      const user = await User.findOne({
+        where: { emailAddress: credentials.name },
+      });
+      console.log(user);
+      if (user) {
+        //compare password with stored password
+        const authenticated = bcrypt.compareSync(
+          credentials.pass,
+          user.password
+        );
         if (authenticated) {
-          console.log(`Authentication for username: ${user.username}`);
-  
+          console.log(
+            `Authentication for username: ${user.firstName} ${user.lastName}`
+          );
+
           //store the user on the Request object.
           req.currentUser = user;
         } else {
-          message = `Authentication failure for username: ${user.username}`;
+          message = `Authentication failure for username: ${user.firstName} ${user.lastName}`;
         }
       } else {
-        message = `User not found for username: ${user.username}`;
+        message = `User not found for username:${user.firstName} ${user.lastName}`;
       }
     } else {
       message = `Auth header not found`;
     }
-    if(message) {
+    //if user is not authenticated
+    if (message) {
       console.warn(message);
-      res.status(401).json({message: 'Access Denied'});
+      res.status(401).json({ message: "Access Denied" });
     } else {
+      //user has been authenticated
       next();
     }
-  
+  } catch (error) {
+    console.log("Sorry there was an issue when authenticating the user:", error);
+    res.status(500);
   }
+};

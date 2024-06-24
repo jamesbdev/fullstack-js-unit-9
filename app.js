@@ -4,7 +4,6 @@
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const { authenticateUser } = require('./middleware/auth-user');
 
 //import authentication library
 const auth = require('basic-auth');
@@ -25,6 +24,7 @@ const sequelize = new Sequelize({
 const userRoutes = require("./routes/user-routes");
 const courseRoutes = require("./routes/course-routes");
 
+
 //add JSON parser 
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
@@ -35,7 +35,9 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
-
+//declare route files
+app.use("/api/users", userRoutes);
+app.use("/api/courses", courseRoutes);
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
@@ -46,9 +48,6 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
-
-app.use("/api/users", userRoutes);
-app.use("/api/courses", courseRoutes);
 
 
 // send 404 if no other route matched
@@ -86,7 +85,7 @@ const server = app.listen(app.get('port'), () => {
 (async () => {
   try {
     await sequelize.authenticate();
-    console.log("connection to the database successful");
+    console.log("Connection to the database successful.");
   } catch (error) {
     console.error('Error connecting to the database: ', error);
   }
