@@ -12,7 +12,7 @@ exports.authenticateUser = async (req, res, next) => {
   let message;
   //get crendentials from authorized header
   const credentials = auth(req);
-  console.log("credentials", credentials);
+
   try {
     if (credentials) {
       //get user from database with same Email address
