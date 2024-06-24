@@ -8,12 +8,6 @@ const bodyParser = require('body-parser');
 //import authentication library
 const auth = require('basic-auth');
 
-//import password hashing library
-const bcrypt = require('bcryptjs');
-//import models
-const { User } = require("./models");
-const { Course } = require("./models");
-
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize({
@@ -21,6 +15,7 @@ const sequelize = new Sequelize({
   storage: 'fsjstd-restapi.db'
 })
 
+//import route files
 const userRoutes = require("./routes/user-routes");
 const courseRoutes = require("./routes/course-routes");
 
@@ -77,7 +72,6 @@ app.set('port', process.env.PORT || 5000);
 const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
-
 
 
 // async IIFE
