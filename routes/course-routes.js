@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 //import authentication middleware
 const { authenticateUser } = require("../middleware/auth-user");
+const { Course } = require("../models");
 
 //get all courses
 router.get("/", async(req, res) => {
@@ -84,7 +85,7 @@ router.get("/", async(req, res) => {
         }
       });
       //send success message
-      res.status(204);
+      res.status(204).send("Course has been deleted");
       console.log("course has been successfully deleted", courseId);
     } catch (error) {
       console.log("Sorry there was an error deleting the course:", error);
