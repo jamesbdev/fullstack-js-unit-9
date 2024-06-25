@@ -55,19 +55,29 @@ router.get("/", async(req, res) => {
     }
   })
   
-  //update course route
+  //UPDATE course route
   router.put("/:id", authenticateUser, jsonParser, async (req, res) => {
     //store course id from the params
     const courseId = req.params.id;
-    //update course
+    //update course with same ID as params
     try {
      const course = await Course.update(req.body, {where: {
        id: courseId,
      }})
+     //check if authenticated user is owner of this course
+     //get id of authenticated user
+     //check with course foreign key userId
+     const foreignKey = req.body.userId;
+     const userId = req.currentUser.id;
+  
+     if(userId !== foreignKey) {
+       res.status(403).send(`unauthorized: your id: ${userId}, course user id: ${foreignKey}`);
+     } else {
       //return 204 status code
-      res.status(204);
+      res.status(204).send("Course has been updated");
       //add success message
       console.log("Course has been updated:", req.body);
+     }
     } catch (error) {
       console.error("Sorry, there was an error when updating a course: ", error);
       //send back error message
@@ -76,7 +86,7 @@ router.get("/", async(req, res) => {
   
   })
   
-  //add delete route
+  // DELETE course route
   router.delete("/:id", authenticateUser, jsonParser, async (req, res) => {
     //store id from params
     const courseId = req.params.id;
