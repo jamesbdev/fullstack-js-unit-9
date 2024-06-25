@@ -5,9 +5,6 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
-//import authentication library
-const auth = require('basic-auth');
-
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize({
@@ -19,10 +16,6 @@ const sequelize = new Sequelize({
 const userRoutes = require("./routes/user-routes");
 const courseRoutes = require("./routes/course-routes");
 
-
-//add JSON parser 
-const jsonParser = bodyParser.json();
-const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';

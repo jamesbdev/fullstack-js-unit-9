@@ -48,13 +48,15 @@ module.exports = (sequelize, DataTypes) => {
     emailAddress: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
       validate: {
         notNull: {
           msg: "Please enter a value for 'emailAddress.'",
         },
         notEmpty: {
           msg: "Please enter a value for 'emailAddress.",
-        }
+        }, //email regex from project 3 - form validation
+        is: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
       }
     },
     password: {

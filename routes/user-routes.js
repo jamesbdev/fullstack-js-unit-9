@@ -10,8 +10,6 @@ const { User } = require("../models");
 const auth = require("basic-auth");
 
 
-
-
 //get info from authenticated user
 router.get("/", authenticateUser, async(req, res) => {
     //how to get authenticated user info?
@@ -24,8 +22,6 @@ router.get("/", authenticateUser, async(req, res) => {
            
         }
     });
-    console.log(user);
-  
       res.status(202).json({user});
     } catch(error) {
        console.error("There was an issue returning the user.", error);
