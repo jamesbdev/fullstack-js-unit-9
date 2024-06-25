@@ -20,9 +20,10 @@ router.get("/", authenticateUser, async(req, res) => {
         where: {
             emailAddress: req.currentUser.emailAddress,
            
-        }
+        },
+        attributes: ["id", "firstName", "lastName", "emailAddress"],
     });
-      res.status(202).json({user});
+      res.status(202).json(user);
     } catch(error) {
        console.error("There was an issue returning the user.", error);
     }

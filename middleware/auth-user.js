@@ -3,17 +3,18 @@ const auth = require("basic-auth");
 //import user model
 const { User } = require("../models/");
 
-
 //import password hashing library
 const bcrypt = require("bcryptjs");
 
 //user authentication middleware
 exports.authenticateUser = async (req, res, next) => {
   let message;
+
   //get crendentials from authorized header
   const credentials = auth(req);
-
+  
   try {
+   
     if (credentials) {
       //get user from database with same Email address
       const user = await User.findOne({
@@ -22,7 +23,7 @@ exports.authenticateUser = async (req, res, next) => {
    
       if (user) {
         //compare password with stored password
-        const authenticated = bcrypt.compareSync(
+        const authenticated = await bcrypt.compareSync(
           credentials.pass,
           user.password
         );
