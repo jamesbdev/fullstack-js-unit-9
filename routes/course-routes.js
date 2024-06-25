@@ -97,9 +97,18 @@ router.get("/", async(req, res) => {
           id: courseId,
         }
       });
-      //send success message
-      res.status(204).send("Course has been deleted");
-      console.log("course has been successfully deleted", courseId);
+      
+      const userId = req.currentUser.id;
+      const foreignKey = req.body.userId;
+      //check if logged user is owner of course
+      if (userId !== foreignKey) {
+        res.status(403).send(`Authorisation denied.`);
+      } else {
+        //send success message
+        res.status(204).send("Course has been deleted");
+        console.log("course has been successfully deleted", courseId);
+      }
+    
     } catch (error) {
       console.log("Sorry there was an error deleting the course:", error);
     }
