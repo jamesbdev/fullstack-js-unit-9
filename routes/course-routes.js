@@ -12,7 +12,9 @@ const { Course } = require("../models");
 //get all courses
 router.get("/", async(req, res) => {
     try {
-      const courses = await Course.findAll();
+      const courses = await Course.findAll({
+        attributes: ["id", "title", "description", "estimatedTime", "materialsNeeded", "userId"]
+      });
       res.json(courses).status(200);
     } catch (error) {
       console.error("Sorry, there was an error when retrieving courses", error);
@@ -26,7 +28,8 @@ router.get("/", async(req, res) => {
       const course = await Course.findAll({
         where: {
           id: courseId,
-        }
+        },
+        attributes: ["id", "title", "description", "estimatedTime", "materialsNeeded", "userId"]
       });
       res.json(course).status(200);
     } catch (error) {

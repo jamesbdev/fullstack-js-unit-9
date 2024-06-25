@@ -30,16 +30,23 @@ router.get("/", authenticateUser, async(req, res) => {
   });
   
   //create a new user
-  router.post("/", authenticateUser, jsonParser, async(req, res) => {
+  router.post("/", jsonParser, async(req, res) => {
     try {
       //create user entry
       const user = await User.create(req.body);
       res.location("/").status(201);
       console.log("User created successfully.", user);
     } catch (error) {
-      console.error("Sorry, there was an error when adding a user:", error);
-      //send back error message to client
-      res.status(400).json(error);
+      //check if email already exists
+      if (error.name === "SequelizeUniqueConstraintError") {
+        //return validation error message
+        res.status(400).json(error.message);
+      } else {
+        console.error("Sorry, there was an error when adding a user:", error);
+        //send back error message to client
+        res.status(400).json(error);
+      }
+   
     }
   });
 
