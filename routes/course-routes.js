@@ -134,7 +134,7 @@ router.delete("/:id", authenticateUser, jsonParser, async (req, res) => {
       const currentUser = req.currentUser.id;
       //check if logged user is owner of course
       if (currentUser !== foreignKey) {
-        res.status(403).send(`Authorisation denied.`);
+        res.status(403).send("Access denied");
       } else {
         //delete course
         course.destroy();
