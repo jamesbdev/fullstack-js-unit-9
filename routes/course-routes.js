@@ -126,31 +126,28 @@ router.put("/:id", authenticateUser, jsonParser, async (req, res) => {
 router.delete("/:id", authenticateUser, jsonParser, async (req, res) => {
   //store id from params
   const courseId = req.params.id;
-
   try {
     //find course with ID from the params
     const course = await Course.findByPk(Number(courseId));
     //check if course exists
     if (course === null) {
       console.log("course not found");
-      res.send({"message": "Course doesn't exist"});
-    } else {
-      const foreignKey = course.userId;
-      //get id of currently logged in user
-      const currentUser = req.currentUser.id;
-      //check if logged user is owner of course
-      if (currentUser !== foreignKey) {
-        res.status(403).send({"message": "Access denied"});
-      } else {
-        //delete course
-        course.destroy();
-        //send success message
-        res.status(204).send({"message": "Course has been deleted"});
-        console.log(`course ${courseId} has been deleted`);
-      }
-    }
+      //send message to client
+      return res.send({"message": "Course doesn't exist"});
+    } 
+    //check if logged user is owner of course
+    const foreignKey = course.userId;
+    const currentUser = req.currentUser.id;
+    if (currentUser !== foreignKey) {
+      return res.status(403).send({"message": "Access denied"});
+    } 
+    //delete course
+    await course.destroy();
+    //send success message
+    res.status(204).send({"message": "Course has been deleted"});
   } catch (error) {
     console.log("Sorry there was an error deleting the course:", error);
+    res.status(500).json({error});
   }
 });
 
