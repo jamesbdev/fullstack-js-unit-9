@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
     emailAddress: {
       type: DataTypes.STRING,
       allowNull: false,
+     
       unique: {
         msg: "Sorry this email is already in use. Please use another email or log in with existing email."
       },
@@ -53,10 +54,14 @@ module.exports = (sequelize, DataTypes) => {
         notNull: {
           msg: "Please enter a value for 'emailAddress.'",
         },
+        is: {
+          args: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/],
+          msg: "Please check the format of the email address provided."
+        },
         notEmpty: {
           msg: "Please enter a value for 'emailAddress.",
         }, //email regex from project 3 - form validation
-        is: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+       
       }
     },
     password: {
