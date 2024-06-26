@@ -25,6 +25,7 @@ router.get("/", async (req, res) => {
       include: {
         model: User,
         as: "user",
+        attributes: ["id", "firstName", "lastName", "emailAddress"],
       },
     });
 
@@ -53,6 +54,7 @@ router.get("/:id", async (req, res) => {
       include: {
         model: User,
         as: "user",
+        attributes: ["id", "firstName", "lastName", "emailAddress"],
       },
     });
     res.json(course).status(200);
@@ -74,11 +76,13 @@ router.post("/", authenticateUser, jsonParser, async (req, res) => {
     //set status to 201
     res.location(`/courses/${course.id}`).status(201).end();
     //log success message
-    console.log("course has been created", newCourse);
+    console.log("course has been created", { newCourse });
   } catch (error) {
-    console.error("Sorry there was an error when creating the course: ", error);
+    //store error messages in array
+    const errors = error.errors.map(err => err.message);
+    console.error("Sorry there was an error when creating the course: ", { errors });
     //send back error message
-    res.status(400).send(error);
+    res.status(400).send({ errors });
   }
 });
 
@@ -92,27 +96,29 @@ router.put("/:id", authenticateUser, jsonParser, async (req, res) => {
     const course = await Course.findByPk(Number(courseId));
 
     //check if course exists
-    if (!course) {
-      return res.status(404).send("course not found");
+    if (course === null) {
+      return res.status(404).send({ "message": "course not found" });
     }
 
     //check if authenticated user is owner of the course
     const userId = req.currentUser.id;
     const foreignKey = course.userId;
     if (userId !== foreignKey) {
-      return res.status(403).send("Access denied");
+      return res.status(403).send({ "message": "Access denied" });
     }
     //update course
     await course.update(req.body);
     //send 204 status code
     res.status(204).end();
   } catch (error) {
+    //store error messages 
+    const errors = error.errors.map(err => err.message);
     console.error(
       "Sorry, there was an error when updating a course: ",
-      error.message
+      { errors }
     );
     //send back error message
-    res.status(400).send(error.message);
+    res.status(400).send({ errors });
   }
 });
 
@@ -127,19 +133,19 @@ router.delete("/:id", authenticateUser, jsonParser, async (req, res) => {
     //check if course exists
     if (course === null) {
       console.log("course not found");
-      res.send("course doesn't exist");
+      res.send({"message": "Course doesn't exist"});
     } else {
       const foreignKey = course.userId;
       //get id of currently logged in user
       const currentUser = req.currentUser.id;
       //check if logged user is owner of course
       if (currentUser !== foreignKey) {
-        res.status(403).send("Access denied");
+        res.status(403).send({"message": "Access denied"});
       } else {
         //delete course
         course.destroy();
         //send success message
-        res.status(204).send("Course has been deleted");
+        res.status(204).send({"message": "Course has been deleted"});
         console.log(`course ${courseId} has been deleted`);
       }
     }

@@ -23,7 +23,7 @@ router.get("/", authenticateUser, async(req, res) => {
         },
         attributes: ["id", "firstName", "lastName", "emailAddress"],
     });
-      res.status(200).json(user);
+      res.status(200).json({user});
     } catch(error) {
        console.error("There was an issue returning the user.", error);
     }
@@ -35,16 +35,19 @@ router.get("/", authenticateUser, async(req, res) => {
       //create user entry
       const user = await User.create(req.body);
       res.location("/").status(201).end();
-      console.log("User created successfully.", user);
+      console.log("User created successfully.", { user });
     } catch (error) {
       //check if email already exists
       if (error.name === "SequelizeUniqueConstraintError") {
+        //store errors in array of messages
+        const errors = error.errors.map(err => err.message);
         //return validation error message
-        res.status(400).json(error.message);
+        res.status(400).json({ errors });
       } else {
-        console.error("Sorry, there was an error when adding a user:", error);
+       //store errors in array of messages
+        const errors = error.errors.map(err => err.message);
         //send back error message to client
-        res.status(400).json(error.message);
+        res.status(400).json({ errors });
       }
    
     }
