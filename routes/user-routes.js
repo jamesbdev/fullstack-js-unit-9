@@ -44,7 +44,7 @@ router.get("/", authenticateUser, async(req, res) => {
       } else {
         console.error("Sorry, there was an error when adding a user:", error);
         //send back error message to client
-        res.status(400).json(error);
+        res.status(400).json(error.message);
       }
    
     }
