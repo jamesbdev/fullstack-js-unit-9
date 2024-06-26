@@ -8,13 +8,20 @@ const jsonParser = bodyParser.json();
 //import authentication middleware
 const { authenticateUser } = require("../middleware/auth-user");
 const { Course } = require("../models");
+const { User } = require("../models");
 
 //get all courses
 router.get("/", async(req, res) => {
     try {
       const courses = await Course.findAll({
-        attributes: ["id", "title", "description", "estimatedTime", "materialsNeeded", "userId"]
+        attributes: ["id", "title", "description", "estimatedTime", "materialsNeeded", "userId"],
+        include: {
+          model: User,
+          as: 'user'
+        }
       });
+      
+    
       res.json(courses).status(200);
     } catch (error) {
       console.error("Sorry, there was an error when retrieving courses", error);
@@ -29,7 +36,11 @@ router.get("/", async(req, res) => {
         where: {
           id: courseId,
         },
-        attributes: ["id", "title", "description", "estimatedTime", "materialsNeeded", "userId"]
+        attributes: ["id", "title", "description", "estimatedTime", "materialsNeeded", "userId"],
+        include: {
+          model: User,
+          as: "user"
+        }
       });
       res.json(course).status(200);
     } catch (error) {
@@ -45,7 +56,7 @@ router.get("/", async(req, res) => {
       const course = await Course.create(newCourse);
       //set location to the created course
       //set status to 201
-      res.location(`/api/courses/${course.id}`).status(201);
+      res.location(`/courses/${course.id}`).status(201).end();
       //log success message
       console.log("course has been created", newCourse);
     } catch (error) {
@@ -81,7 +92,7 @@ router.get("/", async(req, res) => {
     } catch (error) {
       console.error("Sorry, there was an error when updating a course: ", error);
       //send back error message
-      res.status(400).send(error);
+      res.status(400).send(error.message);
     }
   
   })
@@ -90,25 +101,30 @@ router.get("/", async(req, res) => {
   router.delete("/:id", authenticateUser, jsonParser, async (req, res) => {
     //store id from params
     const courseId = req.params.id;
+
     try {
-      //delete course
-      const course = await Course.destroy({ where: 
-        {
-          id: courseId,
-        }
-      });
-      
-      const userId = req.currentUser.id;
-      const foreignKey = req.body.userId;
-      //check if logged user is owner of course
-      if (userId !== foreignKey) {
-        res.status(403).send(`Authorisation denied.`);
+      //find course with ID from the params
+      const course = await Course.findByPk(Number(courseId));
+      //check if course exists
+      if (course === null) {
+        console.log("course not found");
+        res.send("course doesn't exist");
       } else {
-        //send success message
-        res.status(204).send("Course has been deleted");
-        console.log("course has been successfully deleted", courseId);
+        const foreignKey = course.userId;
+        //get id of currently logged in user
+        const currentUser = req.currentUser.id;
+        //check if logged user is owner of course
+        if (currentUser !== foreignKey) {
+          res.status(403).send(`Authorisation denied.`);
+        } else {
+          //delete course
+          course.destroy();
+          //send success message
+          res.status(204).send("Course has been deleted");
+          console.log(`course ${courseId} has been deleted`);
+        }
       }
-    
+     
     } catch (error) {
       console.log("Sorry there was an error deleting the course:", error);
     }

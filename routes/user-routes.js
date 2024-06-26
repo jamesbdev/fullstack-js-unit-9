@@ -23,7 +23,7 @@ router.get("/", authenticateUser, async(req, res) => {
         },
         attributes: ["id", "firstName", "lastName", "emailAddress"],
     });
-      res.status(202).json(user);
+      res.status(200).json(user);
     } catch(error) {
        console.error("There was an issue returning the user.", error);
     }
@@ -34,7 +34,7 @@ router.get("/", authenticateUser, async(req, res) => {
     try {
       //create user entry
       const user = await User.create(req.body);
-      res.location("/").status(201);
+      res.location("/").status(201).end();
       console.log("User created successfully.", user);
     } catch (error) {
       //check if email already exists
